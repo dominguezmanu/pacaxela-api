@@ -1,4 +1,4 @@
-// src/controllers/auth.controller.js
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const UsuarioModel = require('../models/usuarios.model');
@@ -13,14 +13,14 @@ function generarToken(usuario) {
 
   const secret = process.env.JWT_SECRET || 'jwt_simple_secret';
 
-  // Expira en 2 horas (puedes cambiarlo)
+  // Expira en 2 horas 
   const token = jwt.sign(payload, secret, { expiresIn: '2h' });
 
   return token;
 }
 
 const AuthController = {
-  // POST /api/auth/register
+  
   async register(req, res) {
     try {
       const { nombre, email, password, telefono } = req.body;
@@ -32,7 +32,7 @@ const AuthController = {
         });
       }
 
-      // ¿Ya existe el correo?
+      // verifica existencia de correo
       const existe = await UsuarioModel.getByEmail(email);
       if (existe) {
         return res.status(400).json({
@@ -41,7 +41,7 @@ const AuthController = {
         });
       }
 
-      // Por defecto, rol 3 = comprador
+      // Por defecto tira rol 3 de comprador
       const nuevo = await UsuarioModel.create({
         nombre,
         email,
@@ -127,7 +127,7 @@ const AuthController = {
     }
   },
 
-  // GET /api/auth/me (requiere token)
+  // GET /api/auth/me 
   async me(req, res) {
     try {
       // req.user viene del middleware de auth

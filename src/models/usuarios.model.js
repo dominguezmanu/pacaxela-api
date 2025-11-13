@@ -3,7 +3,7 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 const UsuarioModel = {
-  // Obtener todos los usuarios (sin contraseña)
+  // Obtener todos los usuarios
   async getAll() {
     const [rows] = await pool.query(
       'SELECT id_usuario, nombre, email, telefono, fecha_registro, id_rol, estado FROM usuarios'
@@ -11,7 +11,7 @@ const UsuarioModel = {
     return rows;
   },
 
-  // Obtener usuario por ID (sin contraseña)
+  // Obtener usuario por ID 
   async getById(id) {
     const [rows] = await pool.query(
       'SELECT id_usuario, nombre, email, telefono, fecha_registro, id_rol, estado FROM usuarios WHERE id_usuario = ?',
@@ -20,7 +20,7 @@ const UsuarioModel = {
     return rows[0] || null;
   },
 
-  // 👉 NUEVO: obtener usuario por email (incluye password_hash)
+  // obtener usuario por email 
   async getByEmail(email) {
     const [rows] = await pool.query(
       'SELECT * FROM usuarios WHERE email = ? LIMIT 1',
@@ -29,7 +29,7 @@ const UsuarioModel = {
     return rows[0] || null;
   },
 
-  // Crear usuario (con contraseña encriptada)
+  // Crear usuario 
   async create(data) {
     const { nombre, email, password, telefono, id_rol } = data;
 
@@ -45,7 +45,7 @@ const UsuarioModel = {
     return { id_usuario: result.insertId };
   },
 
-  // Actualizar usuario (sin cambiar contraseña)
+  // Actualizar usuario 
   async update(id, data) {
     const { nombre, email, telefono, id_rol, estado } = data;
 

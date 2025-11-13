@@ -1,4 +1,3 @@
-// src/controllers/usuarios.controller.js
 const UsuarioModel = require('../models/usuarios.model');
 
 const UsuarioController = {

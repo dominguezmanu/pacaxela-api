@@ -4,11 +4,12 @@ const router = express.Router();
 
 const usuarioRoutes = require('./usuarios.routes');
 const authRoutes = require('./auth.routes');
+const categoriaRoutes = require('./categorias.routes');
 
-// Auth
+
+
 router.use('/auth', authRoutes);
-
-// Usuarios
 router.use('/usuarios', usuarioRoutes);
-
+router.use('/categorias', categoriaRoutes);
+router.use('/tallas', tallaRoutes);
 module.exports = router;

@@ -1,4 +1,3 @@
-// src/middlewares/auth.middleware.js
 const jwt = require('jsonwebtoken');
 
 function authMiddleware(req, res, next) {
@@ -25,7 +24,7 @@ function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, secret);
-    req.user = decoded; // aquí ya sabemos quién es el usuario
+    req.user = decoded; // aquí ya sabemos quien es el usuario
     next();
   } catch (error) {
     console.error('Error al verificar token:', error);
