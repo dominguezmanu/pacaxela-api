@@ -29,7 +29,7 @@ const RolController = {
 
   async crear(req, res) {
     try {
-      const { nombre, descripcion } = req.body;
+      const { nombre} = req.body;
 
       if (!nombre) {
         return res.status(400).json({
@@ -38,7 +38,7 @@ const RolController = {
         });
       }
 
-      const nuevo = await RolModel.create({ nombre, descripcion });
+      const nuevo = await RolModel.create({ nombre });
 
       res.status(201).json({
         ok: true,
@@ -54,7 +54,7 @@ const RolController = {
   async actualizar(req, res) {
     try {
       const { id } = req.params;
-      const { nombre, descripcion } = req.body;
+      const { nombre} = req.body;
 
       if (!nombre) {
         return res.status(400).json({
@@ -68,7 +68,7 @@ const RolController = {
         return res.status(404).json({ ok: false, message: 'Rol no encontrado' });
       }
 
-      await RolModel.update(id, { nombre, descripcion });
+      await RolModel.update(id, { nombre });
 
       res.json({ ok: true, message: 'Rol actualizado correctamente' });
     } catch (error) {

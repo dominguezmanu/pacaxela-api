@@ -1,9 +1,7 @@
-// src/models/usuarios.model.js
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 const UsuarioModel = {
-  // Obtener todos los usuarios
   async getAll() {
     const [rows] = await pool.query(
       'SELECT id_usuario, nombre, email, telefono, fecha_registro, id_rol, estado FROM usuarios'
@@ -11,7 +9,6 @@ const UsuarioModel = {
     return rows;
   },
 
-  // Obtener usuario por ID 
   async getById(id) {
     const [rows] = await pool.query(
       'SELECT id_usuario, nombre, email, telefono, fecha_registro, id_rol, estado FROM usuarios WHERE id_usuario = ?',
@@ -20,7 +17,6 @@ const UsuarioModel = {
     return rows[0] || null;
   },
 
-  // obtener usuario por email 
   async getByEmail(email) {
     const [rows] = await pool.query(
       'SELECT * FROM usuarios WHERE email = ? LIMIT 1',
@@ -29,7 +25,6 @@ const UsuarioModel = {
     return rows[0] || null;
   },
 
-  // Crear usuario 
   async create(data) {
     const { nombre, email, password, telefono, id_rol } = data;
 
@@ -45,7 +40,6 @@ const UsuarioModel = {
     return { id_usuario: result.insertId };
   },
 
-  // Actualizar usuario 
   async update(id, data) {
     const { nombre, email, telefono, id_rol, estado } = data;
 
@@ -59,7 +53,6 @@ const UsuarioModel = {
     return true;
   },
 
-  // Eliminar usuario
   async delete(id) {
     await pool.query(
       'DELETE FROM usuarios WHERE id_usuario = ?',
