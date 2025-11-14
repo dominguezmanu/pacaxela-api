@@ -1,4 +1,3 @@
-// src/routes/index.js
 const express = require('express');
 const router = express.Router();
 
@@ -15,6 +14,10 @@ const direccionesRoutes = require('./direcciones.routes');;
 const publicacionesRoutes = require('./publicaciones.routes');
 const fotosPublicacionRoutes = require('./fotosPublicacion.routes');
 const pedidosRoutes = require('./pedidos.routes');
+const resenasRoutes = require('./resenas.routes');
+const mensajesRoutes = require('./mensajes.routes');
+const favoritosRoutes = require('./favoritos.routes');
+const rolesRoutes = require('./roles.routes');
 
 
 router.use('/auth', authRoutes);
@@ -29,5 +32,10 @@ router.use('/direcciones', direccionesRoutes);
 router.use('/publicaciones', publicacionesRoutes);
 router.use('/fotos-publicacion', fotosPublicacionRoutes);
 router.use('/pedidos', pedidosRoutes);
+router.use('/resenas', resenasRoutes);
+router.use('/mensajes', mensajesRoutes);
+router.use('/favoritos', favoritosRoutes);
+router.use('/roles', rolesRoutes);
+
 
 module.exports = router;
