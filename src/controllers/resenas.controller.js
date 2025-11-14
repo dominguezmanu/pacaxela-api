@@ -1,87 +1,137 @@
-const pool = require('../config/db');
+const ResenaModel = require('../models/resenas.model');
+const PedidoModel = require('../models/pedidos.model');
 
-const ResenaModel = {
-  
-    async getAll(filtros = {}) {
-    let sql = `
-      SELECT 
-        id_resena,
-        id_pedido,
-        id_usuario,
-        comentario,
-        calificacion,
-        fecha_resena
-      FROM \`reseñas\`
-      WHERE 1 = 1
-    `;
-    const params = [];
+const ResenaController = {
+  async listar(req, res) {
+    try {
+      const { id_pedido, id_usuario } = req.query;
 
-    if (filtros.id_pedido) {
-      sql += ' AND id_pedido = ?';
-      params.push(filtros.id_pedido);
+      const filtros = {};
+      if (id_pedido) filtros.id_pedido = id_pedido;
+      if (id_usuario) filtros.id_usuario = id_usuario;
+
+      const resenas = await ResenaModel.getAll(filtros);
+      res.json({ ok: true, data: resenas });
+    } catch (error) {
+      console.error('Error al listar reseñas:', error);
+      res.status(500).json({ ok: false, message: 'Error al listar reseñas' });
     }
+  },
 
-    if (filtros.id_usuario) {
-      sql += ' AND id_usuario = ?';
-      params.push(filtros.id_usuario);
+  async obtenerPorId(req, res) {
+    try {
+      const { id } = req.params;
+      const resena = await ResenaModel.getById(id);
+
+      if (!resena) {
+        return res.status(404).json({ ok: false, message: 'Reseña no encontrada' });
+      }
+
+      res.json({ ok: true, data: resena });
+    } catch (error) {
+      console.error('Error al obtener reseña:', error);
+      res.status(500).json({ ok: false, message: 'Error al obtener reseña' });
     }
-
-    sql += ' ORDER BY fecha_resena DESC';
-
-    const [rows] = await pool.query(sql, params);
-    return rows;
   },
 
-  async getById(id) {
-    const [rows] = await pool.query(
-      `SELECT 
-        id_resena,
+  async crear(req, res) {
+    try {
+      const { id_pedido, comentario, calificacion } = req.body;
+
+      if (!req.user) {
+        return res.status(401).json({ ok: false, message: 'No autorizado' });
+      }
+
+      if (!id_pedido || calificacion === undefined) {
+        return res.status(400).json({
+          ok: false,
+          message: 'id_pedido y calificacion son obligatorios'
+        });
+      }
+
+      if (calificacion < 1 || calificacion > 5) {
+        return res.status(400).json({
+          ok: false,
+          message: 'La calificación debe estar entre 1 y 5'
+        });
+      }
+
+      const pedido = await PedidoModel.getById(id_pedido);
+      if (!pedido) {
+        return res.status(400).json({
+          ok: false,
+          message: 'El pedido indicado no existe'
+        });
+      }
+
+      const nueva = await ResenaModel.create({
         id_pedido,
-        id_usuario,
+        id_usuario: req.user.id_usuario,
         comentario,
-        calificacion,
-        fecha_resena
-       FROM \`reseñas\`
-       WHERE id_resena = ?`,
-      [id]
-    );
-    return rows[0] || null;
+        calificacion
+      });
+
+      res.status(201).json({
+        ok: true,
+        message: 'Reseña creada correctamente',
+        data: nueva
+      });
+    } catch (error) {
+      console.error('Error al crear reseña:', error);
+      res.status(500).json({ ok: false, message: 'Error al crear reseña' });
+    }
   },
 
-  async create(data) {
-    const { id_pedido, id_usuario, comentario, calificacion } = data;
+  async actualizar(req, res) {
+    try {
+      const { id } = req.params;
+      const { comentario, calificacion } = req.body;
 
-    const [result] = await pool.query(
-      `INSERT INTO \`reseñas\`
-       (id_pedido, id_usuario, comentario, calificacion)
-       VALUES (?, ?, ?, ?)`,
-      [id_pedido, id_usuario, comentario || null, calificacion]
-    );
+      if (calificacion === undefined) {
+        return res.status(400).json({
+          ok: false,
+          message: 'calificacion es obligatoria'
+        });
+      }
 
-    return { id_resena: result.insertId };
+      if (calificacion < 1 || calificacion > 5) {
+        return res.status(400).json({
+          ok: false,
+          message: 'La calificación debe estar entre 1 y 5'
+        });
+      }
+
+      const resena = await ResenaModel.getById(id);
+      if (!resena) {
+        return res.status(404).json({ ok: false, message: 'Reseña no encontrada' });
+      }
+
+      await ResenaModel.update(id, { comentario, calificacion });
+
+      res.json({ ok: true, message: 'Reseña actualizada correctamente' });
+    } catch (error) {
+      console.error('Error al actualizar reseña:', error);
+      res.status(500).json({ ok: false, message: 'Error al actualizar reseña' });
+    }
   },
 
-  
-  async update(id, data) {
-    const { comentario, calificacion } = data;
+  async eliminar(req, res) {
+    try {
+      const { id } = req.params;
 
-    await pool.query(
-      `UPDATE \`reseñas\`
-       SET comentario = ?, calificacion = ?
-       WHERE id_resena = ?`,
-      [comentario || null, calificacion, id]
-    );
+      const resena = await ResenaModel.getById(id);
+      if (!resena) {
+        return res.status(404).json({ ok: false, message: 'Reseña no encontrada' });
+      }
 
-    return true;
-  },
+      await ResenaModel.delete(id);
 
-  async delete(id) {
-    await pool.query(
-      'DELETE FROM `reseñas` WHERE id_resena = ?',
-      [id]
-    );
-    return true;
+      res.json({ ok: true, message: 'Reseña eliminada correctamente' });
+    } catch (error) {
+      console.error('Error al eliminar reseña:', error);
+      res.status(500).json({ ok: false, message: 'Error al eliminar reseña' });
+    }
   }
 };
 
-module.exports = ResenaModel;
+module.exports = ResenaController;
